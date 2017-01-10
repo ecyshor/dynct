@@ -1,0 +1,53 @@
+hash: 9252ecf2ac6bf498470aef5c9462ac05e5d9c179799c329e053dc453e1d5dd03
+updated: 2017-01-10T15:36:30.773255482+02:00
+imports:
+- name: github.com/aws/aws-sdk-go
+  version: 63ce630574a5ec05ecd8e8de5cea16332a5a684d
+  subpackages:
+  - aws
+  - aws/awserr
+  - aws/awsutil
+  - aws/client
+  - aws/client/metadata
+  - aws/corehandlers
+  - aws/credentials
+  - aws/credentials/ec2rolecreds
+  - aws/credentials/endpointcreds
+  - aws/credentials/stscreds
+  - aws/defaults
+  - aws/ec2metadata
+  - aws/endpoints
+  - aws/request
+  - aws/session
+  - aws/signer/v4
+  - private/protocol
+  - private/protocol/json/jsonutil
+  - private/protocol/jsonrpc
+  - private/protocol/query
+  - private/protocol/query/queryutil
+  - private/protocol/rest
+  - private/protocol/xml/xmlutil
+  - private/waiter
+  - service/dynamodb
+  - service/dynamodb/dynamodbattribute
+  - service/dynamodb/dynamodbiface
+  - service/sqs
+  - service/sqs/sqsiface
+  - service/sts
+- name: github.com/go-ini/ini
+  version: 6f66b0e091edb3c7b380f7c4f0f884274d550b67
+- name: github.com/jmespath/go-jmespath
+  version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 2402e8e7a02fc811447d11f881aa9746cdc57983
+  subpackages:
+  - assert
