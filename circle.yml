@@ -7,5 +7,7 @@ machine:
     - sudo rm -rf /usr/local/go
     - sudo tar -C /usr/local -xzf download/$GODIST
 dependencies:
-  override:
+  pre:
     - go get -u -v github.com/Masterminds/glide
+  override:
+    - glide install
