@@ -2,9 +2,9 @@ machine:
   environment:
     GODIST: "go1.7.4.linux-amd64.tar.gz"
     # GOROOT is not set by default
-    GOROOT: ""
+    GOROOT: "/usr/local/go"
     PATH: "/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:${PATH}"
-    GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project:${HOME}:${HOME/dynct/vendor}"
+    GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project:${HOME}:${HOME}/dynct/vendor"
 
   post:
     - mkdir -p download
@@ -16,8 +16,6 @@ dependencies:
     - go get -u -v github.com/Masterminds/glide
   override:
     - glide install
-    - mkdir vendor/src
-    - cp -R vendor/git* vendor/src
 test:
   override:
     - go test $(glide novendor)
