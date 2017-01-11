@@ -1,4 +1,6 @@
 # dynct
+[![CircleCI](https://circleci.com/gh/ecyshor/dynct.svg?style=svg)](https://circleci.com/gh/ecyshor/dynct)
+
 Ensure constant write throughput to dynamodb using sqs so you can insure the provisioned throughput is not exceeded 
 ## How?
 Every item which need to be written to the table is instead being pushed to a sqs queue, from which dynct will read in an internal buffer and consume the buffer at the desired constant rate.
