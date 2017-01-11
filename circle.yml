@@ -16,6 +16,8 @@ dependencies:
     - go get -u -v github.com/Masterminds/glide
   override:
     - glide install
+    - mkdir vendor/src
+    - cp -R vendor/git* vendor/src
 test:
   override:
     - go test $(glide novendor)
