@@ -1,0 +1,134 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Create the queue for dynct service, along with a configurable alarm for queue depth."
+Parameters:
+  Environment:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - PROD
+  AlarmEmail:
+    Description: "Email address to notify if the queue grows beyond the configured depth."
+    Type: "String"
+  QueueDepth:
+    Description: "Maximum number of messages in queue before triggering alarm"
+    Type: "Number"
+  TableName:
+    Description: "The name of the table where dynct is writing. Currently only used for queue name."
+    Type: "String"
+  DynctTable:
+    Description: "The arn of the table where dynct is writing."
+    Type: "String"
+Resources:
+  DynctQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      QueueName: !Join [ "-", [ "dynct", !Ref TableName, !Ref Environment] ]
+      ReceiveMessageWaitTimeSeconds: 20
+      VisibilityTimeout: 120
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DynctDeadLetter.Arn
+        maxReceiveCount: 5
+    DependsOn:
+      - DynctDeadLetter
+  DynctDeadLetter:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      QueueName: !Join [ "-", [ "dynct", !Ref TableName,"dlq",!Ref Environment] ]
+
+  AlarmTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      Subscription:
+        -
+          Endpoint:
+            Ref: "AlarmEmail"
+          Protocol: "email"
+  QueueDepthAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmDescription: "Alarm if queue depth grows beyond configured messages"
+      Namespace: "AWS/SQS"
+      MetricName: "ApproximateNumberOfMessagesVisible"
+      Dimensions:
+        -
+          Name: "QueueName"
+          Value:
+            Fn::GetAtt:
+              - "DynctQueue"
+              - "QueueName"
+        -
+          Name: "DLQueueName"
+          Value:
+            Fn::GetAtt:
+              - "DynctDeadLetter"
+              - "QueueName"
+      Statistic: "Sum"
+      Period: "300"
+      EvaluationPeriods: "1"
+      Threshold: !Ref QueueDepth
+      ComparisonOperator: "GreaterThanThreshold"
+      AlarmActions:
+        -
+          Ref: "AlarmTopic"
+      InsufficientDataActions:
+        -
+          Ref: "AlarmTopic"
+  DynctRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ecs-tasks.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: !Join ["-",["dynct", !Ref Environment]]
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource: !Ref DynctTable
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:DeleteMessageBatch
+                  - sqs:GetQueueAttributes
+                Resource: !GetAtt DynctQueue.Arn
+  DynctInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        -
+          Ref: "DynctRole"
+Outputs:
+  QueueURL:
+    Description: "URL of newly created SQS Queue"
+    Value:
+      Ref: "DynctQueue"
+  QueueARN:
+    Description: "ARN of newly created SQS Queue"
+    Value:
+      Fn::GetAtt:
+        - "DynctQueue"
+        - "Arn"
+  QueueName:
+    Description: "Name newly created SQS Queue"
+    Value:
+      Fn::GetAtt:
+        - "DynctQueue"
+        - "QueueName"
+  DynctRole:
+    Description: "Arn of role used for dynct"
+    Value: !Ref DynctRole
