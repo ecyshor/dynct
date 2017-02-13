@@ -15,6 +15,7 @@ func main() {
 		QueueUrl:os.Getenv("QUEUE_URL"),
 		TableName:os.Getenv("TABLE_NAME"),
 	}
+	fmt.Println("Starting dynct with configuration", configuration)
 	puller, err := NewPuller(configuration)
 	writer := NewDynamo(configuration)
 	if (err != nil) {
