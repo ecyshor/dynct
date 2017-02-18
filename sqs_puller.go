@@ -22,6 +22,7 @@ type WriteEntry struct {
 }
 
 func NewPuller(configuration *Configuration) (*SqsClient, error) {
+	fmt.Println("Starting puller with configuration", configuration)
 	sess, err := session.NewSession()
 	if err != nil {
 		fmt.Println("failed to create session,", err)
@@ -38,6 +39,7 @@ func NewPuller(configuration *Configuration) (*SqsClient, error) {
 func (puller *SqsClient) start() {
 	ticker := time.NewTicker(100 * time.Millisecond)
 	messagesBuffer := make(chan *WriteEntry, puller.configuration.BufferSize + 10)
+	fmt.Println("Starting sqs pulling")
 	go func() {
 		for {
 			select {

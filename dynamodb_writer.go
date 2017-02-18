@@ -15,6 +15,7 @@ type DynamoDb struct {
 }
 
 func NewDynamo(config *Configuration) *DynamoDb {
+	fmt.Println("Starting dynamodb writer with configuration", config)
 	sess, err := session.NewSession()
 	if err != nil {
 		fmt.Println("failed to create session,", err)
