@@ -5,10 +5,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
-	"fmt"
 	"time"
 	"math"
+	"github.com/op/go-logging"
 )
+
+var log = logging.MustGetLogger("sqs_puller")
 
 type SqsClient struct {
 	sqsClient      sqsiface.SQSAPI
@@ -22,10 +24,10 @@ type WriteEntry struct {
 }
 
 func NewPuller(configuration *Configuration) (*SqsClient, error) {
-	fmt.Println("Starting puller with configuration", configuration)
+	log.Infof("Starting puller with configuration", configuration)
 	sess, err := session.NewSession()
 	if err != nil {
-		fmt.Println("failed to create session,", err)
+		log.Fatalf("failed to create session,", err)
 		return nil, err
 	}
 	puller := &SqsClient{
@@ -39,13 +41,15 @@ func NewPuller(configuration *Configuration) (*SqsClient, error) {
 func (puller *SqsClient) start() {
 	ticker := time.NewTicker(100 * time.Millisecond)
 	messagesBuffer := make(chan *WriteEntry, puller.configuration.BufferSize + 10)
-	fmt.Println("Starting sqs pulling")
+	log.Infof("Starting sqs pulling")
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
+				log.Debug("Running update on ticker config")
 				if len(messagesBuffer) < puller.configuration.BufferSize {
 					//TODO ensure puller does just one long pulling call, but when buffer is not full and queue has entries then do on multiple routines
+					log.Debug("Running retrieve from sqs using long pulling.")
 					puller.retrieve(messagesBuffer)
 				}
 			}
@@ -70,9 +74,10 @@ func (puller *SqsClient) retrieve(output chan *WriteEntry) {
 	if err != nil {
 		// Print the error, cast err to awserr.Error to get the Code and
 		// Message from an error.
-		fmt.Println(err.Error())
+		log.Fatalf("Error while calling receive message from sqs", err)
 		return
 	}
+	log.Debugf("Send %s write entries from sqs", len(resp.Messages))
 	for _, message := range resp.Messages {
 		output <- &WriteEntry{
 			Json:*message.Body,

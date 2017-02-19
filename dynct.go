@@ -5,9 +5,20 @@ import (
 	"fmt"
 	"time"
 	"strconv"
+	"github.com/op/go-logging"
+)
+
+var log = logging.MustGetLogger("dynct")
+
+// Example format string. Everything except the message has a custom color
+// which is dependent on the log level. Many fields have a custom output
+// formatting too, eg. the time returns the hour down to the milli second.
+var format = logging.MustStringFormatter(
+	`%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x} %{message}`,
 )
 
 func main() {
+	configureLogging()
 	writeThroughput := envToInt("WRITE_THROUGHPUT")
 	defaultBuffers := writeThroughput * 20
 	configuration := &Configuration{
@@ -15,7 +26,7 @@ func main() {
 		QueueUrl:os.Getenv("QUEUE_URL"),
 		TableName:os.Getenv("TABLE_NAME"),
 	}
-	fmt.Println("Starting dynct with configuration", configuration)
+	log.Infof("Starting dynct with configuration", configuration)
 	puller, err := NewPuller(configuration)
 	writer := NewDynamo(configuration)
 	if (err != nil) {
@@ -36,6 +47,14 @@ func start(writeThroughput int, writingChannel chan *WriteEntry, incomingChannel
 			transferWrites(writeThroughput, writingChannel, incomingChannel)
 		}
 	}
+}
+
+func configureLogging() {
+	defaultLogging := logging.NewLogBackend(os.Stdout, "", 0)
+	formattedBackend := logging.NewBackendFormatter(defaultLogging, format)
+	leveledBackend := logging.AddModuleLevel(formattedBackend)
+	leveledBackend.SetLevel(logging.DEBUG, "")
+	logging.SetBackend(leveledBackend)
 }
 
 func transferWrites(throughput int, writingChannel chan *WriteEntry, messages chan *WriteEntry) {

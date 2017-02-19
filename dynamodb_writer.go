@@ -7,7 +7,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/op/go-logging"
 )
+
+var log = logging.MustGetLogger("sqs_puller")
 
 type DynamoDb struct {
 	Configuration *Configuration
@@ -15,7 +18,7 @@ type DynamoDb struct {
 }
 
 func NewDynamo(config *Configuration) *DynamoDb {
-	fmt.Println("Starting dynamodb writer with configuration", config)
+	log.Infof("Starting dynamodb writer with configuration", config)
 	sess, err := session.NewSession()
 	if err != nil {
 		fmt.Println("failed to create session,", err)
@@ -29,31 +32,33 @@ func NewDynamo(config *Configuration) *DynamoDb {
 	return client
 }
 
-func (d *DynamoDb) pipeThrough(inputChan chan *WriteEntry, output chan *WriteEntry) {
+func (dynamo *DynamoDb) pipeThrough(inputChan chan *WriteEntry, output chan *WriteEntry) {
 	go func() {
 		for {
 			entry := <-inputChan
 			go func() {
+				log.Debugf("Writing json entry to dynamo.", entry)
 				var entryJson interface{}
 				err := json.Unmarshal([]byte(entry.Json), &entryJson)
 				if (err != nil) {
-					fmt.Println("failed to parse json,", err)
+					log.Errorf("failed to parse json,", err)
 					return
 				}
 				parsedJson := entryJson.(map[string]interface{})
 				att, err := dynamodbattribute.MarshalMap(parsedJson)
 				if (err != nil) {
-					fmt.Println("failed to marshal json,", err)
+					log.Errorf("failed to marshal json,", err)
 					return
 				}
 				returnValue := dynamodb.ReturnValueNone
-				_, err = d.ApiClient.PutItem(&dynamodb.PutItemInput{
-					TableName:&d.Configuration.TableName,
+				log.Debugf("Writing parsed entry to dynamo", att)
+				_, err = dynamo.ApiClient.PutItem(&dynamodb.PutItemInput{
+					TableName:&dynamo.Configuration.TableName,
 					Item:att,
 					ReturnValues:&returnValue,
 				})
 				if (err != nil) {
-					fmt.Println("failed to put item to dynamodb,", err)
+					log.Errorf("failed to put item to dynamodb,", err)
 					return
 				} else {
 					output <- entry

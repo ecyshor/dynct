@@ -1,8 +1,8 @@
-hash: 9252ecf2ac6bf498470aef5c9462ac05e5d9c179799c329e053dc453e1d5dd03
-updated: 2017-01-10T15:36:30.773255482+02:00
+hash: 66f9a234a222aa0b39e0cb2bb0573f8a41a5426c641ff09194403b09965e3e50
+updated: 2017-02-19T09:08:48.802083032+02:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: 63ce630574a5ec05ecd8e8de5cea16332a5a684d
+  version: b2852089fcfd0794d25d57f193e15121ab8a6d9e
   subpackages:
   - aws
   - aws/awserr
@@ -38,6 +38,8 @@ imports:
   version: 6f66b0e091edb3c7b380f7c4f0f884274d550b67
 - name: github.com/jmespath/go-jmespath
   version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
+- name: github.com/op/go-logging
+  version: b2cb9fa56473e98db8caba80237377e83fe44db5
 testImports:
 - name: github.com/davecgh/go-spew
   version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
