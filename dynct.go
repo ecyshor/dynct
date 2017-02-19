@@ -57,7 +57,8 @@ func configureLogging() {
 	leveledBackend.SetLevel(logging.DEBUG, "")
 	logging.SetBackend(leveledBackend)
 }
-
+//TODO move this to own file and structure and improve logic by spreading the writes across a second and only exceed capacity with one item if it's just one item
+//TODO add another inner buffer which is optimizes the way we write the items by rearranging them in the most optimum way possible (should also ensure a maximum ttl in memory for an item before it takes precedence)
 func transferWrites(throughput int, writingChannel chan *WriteEntry, messages chan *WriteEntry) {
 	for i := 0; i < throughput; {
 		message := <-messages
