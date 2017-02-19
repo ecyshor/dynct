@@ -35,7 +35,6 @@ vendor/
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
-.idea/**/workspace.xml
 .idea/**/tasks.xml
 
 # Sensitive or high-churn files:
@@ -49,8 +48,7 @@ vendor/
 
 # Gradle:
 .idea/**/gradle.xml
-.idea/**/libraries
-
+.idea
 # Mongo Explorer plugin:
 .idea/**/mongoSettings.xml
 
@@ -74,3 +72,26 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+### JetBrains template
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# User-specific stuff:
+
+# Sensitive or high-churn files:
+
+# Gradle:
+
+# Mongo Explorer plugin:
+
+## File-based project format:
+
+## Plugin-specific files:
+
+# IntelliJ
+
+# mpeltonen/sbt-idea plugin
+
+# JIRA plugin
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
