@@ -27,7 +27,7 @@ func main() {
 		TableName:os.Getenv("TABLE_NAME"),
 	}
 	log.Infof("Starting dynct with configuration", configuration)
-	puller, err := NewPuller(configuration)
+	sqsClient, err := NewSqsClient(configuration)
 	writer := NewDynamo(configuration)
 	if (err != nil) {
 		fmt.Println("failed to create puller,", err)
@@ -36,7 +36,8 @@ func main() {
 	writingChannel := make(chan *WriteEntry, defaultBuffers)
 	deletingChannel := make(chan *WriteEntry, defaultBuffers)
 	go writer.pipeThrough(writingChannel, deletingChannel)
-	start(writeThroughput, writingChannel, puller.messagesBuffer)
+	go sqsClient.HandleDeletes(deletingChannel)
+	start(writeThroughput, writingChannel, sqsClient.messagesBuffer)
 }
 
 func start(writeThroughput int, writingChannel chan *WriteEntry, incomingChannel chan *WriteEntry) {

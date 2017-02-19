@@ -20,7 +20,7 @@ type WriteEntry struct {
 	WriteUnitesConsumed int
 }
 
-func NewPuller(configuration *Configuration) (*SqsClient, error) {
+func NewSqsClient(configuration *Configuration) (*SqsClient, error) {
 	log.Infof("Starting puller with configuration", configuration)
 	sess, err := session.NewSession()
 	if err != nil {

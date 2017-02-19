@@ -48,7 +48,6 @@ func (dynamo *DynamoDb) pipeThrough(inputChan chan *WriteEntry, output chan *Wri
 					return
 				}
 				returnValue := dynamodb.ReturnValueNone
-				log.Debugf("Writing parsed entry to dynamo", att)
 				_, err = dynamo.ApiClient.PutItem(&dynamodb.PutItemInput{
 					TableName:&dynamo.Configuration.TableName,
 					Item:att,
@@ -56,7 +55,6 @@ func (dynamo *DynamoDb) pipeThrough(inputChan chan *WriteEntry, output chan *Wri
 				})
 				if (err != nil) {
 					log.Errorf("failed to put item to dynamodb,", err)
-					return
 				} else {
 					output <- entry
 				}
