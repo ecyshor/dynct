@@ -2,10 +2,7 @@ package main
 
 import (
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/op/go-logging"
 )
-
-var log = logging.MustGetLogger("sqs_deleter")
 
 func (deleter *SqsClient) HandleDeletes(deleteChannel chan WriteEntry) {
 	for {

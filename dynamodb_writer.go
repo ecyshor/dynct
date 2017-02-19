@@ -7,10 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"github.com/op/go-logging"
 )
-
-var log = logging.MustGetLogger("sqs_puller")
 
 type DynamoDb struct {
 	Configuration *Configuration

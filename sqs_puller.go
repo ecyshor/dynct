@@ -7,10 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
 	"time"
 	"math"
-	"github.com/op/go-logging"
 )
-
-var log = logging.MustGetLogger("sqs_puller")
 
 type SqsClient struct {
 	sqsClient      sqsiface.SQSAPI
